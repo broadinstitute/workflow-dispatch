@@ -135,13 +135,13 @@ export class WorkflowHandler {
       debug('List Workflow Runs', response);
 
       const runs = response.data.workflow_runs
-        .filter((r: any) => new Date(r.created_at).setMilliseconds(0) >= this.triggerDate);
-      debug(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((r: any) => ({
-        id: r.id,
-        name: r.name,
-        created_at: r.creatd_at,
+        .filter((run: any) => new Date(run.created_at).setMilliseconds(0) >= this.triggerDate).reverse();
+      debug(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((run: any) => ({
+        id: run.id,
+        name: run.name,
+        created_at: run.created_at,
         triggerDate: new Date(this.triggerDate).toISOString(),
-        created_at_ts: new Date(r.created_at).valueOf(),
+        created_at_ts: new Date(run.created_at).valueOf(),
         triggerDateTs: this.triggerDate
       })));
   
