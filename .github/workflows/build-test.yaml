@@ -172,6 +172,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Download dist
         uses: actions/download-artifact@v3
         with:
@@ -215,6 +217,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Download dist
         uses: actions/download-artifact@v3
         with:
