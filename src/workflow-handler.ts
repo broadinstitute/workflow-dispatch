@@ -172,6 +172,11 @@ export class WorkflowHandler {
   }
 
   private async findWorklowRunIdFromRunName(runName: string): Promise<number> {
+    core.info('findWorklowRunIdFromRunName triggered 🚀');
+    core.info('runName='+runName);
+    core.info('owner='+this.owner);
+    core.info('repo='+this.repo);
+    core.info('ref='+this.ref);
     const result = await this.octokit.rest.checks.listForRef({
       check_name: runName,
       owner: this.owner,
@@ -179,6 +184,8 @@ export class WorkflowHandler {
       ref: this.ref,
       filter: 'latest'
     });
+
+    core.info('result='+this.ref);
 
     if (result.length == 0) {
       throw new Error('Run not found');

@@ -10135,6 +10135,11 @@ class WorkflowHandler {
     }
     findWorklowRunIdFromRunName(runName) {
         return __awaiter(this, void 0, void 0, function* () {
+            core.info('findWorklowRunIdFromRunName triggered 🚀');
+            core.info('runName=' + runName);
+            core.info('owner=' + this.owner);
+            core.info('repo=' + this.repo);
+            core.info('ref=' + this.ref);
             const result = yield this.octokit.rest.checks.listForRef({
                 check_name: runName,
                 owner: this.owner,
@@ -10142,6 +10147,7 @@ class WorkflowHandler {
                 ref: this.ref,
                 filter: 'latest'
             });
+            core.info('result=' + this.ref);
             if (result.length == 0) {
                 throw new Error('Run not found');
             }
