@@ -185,8 +185,8 @@ export class WorkflowHandler {
       filter: 'latest'
     });
 
-    core.info('result length='+result.length);
-    core.info('result='+result);
+    core.info('result.total_count='+result.total_count);
+    core.info('result.check_runs[0].id='+result.check_runs[0].id);
 
     if (result.length == 0) {
       throw new Error('Run not found');
