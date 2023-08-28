@@ -213,6 +213,8 @@ jobs:
     runs-on: ubuntu-latest
     name: "workflow-dispatch-identification-test [trigger|by workflow filename]"
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
       - name: Invoke 'workflow-dispatch-identification' workflow and wait for result using this action
         id: workflow-dispatch-identification
         uses: ./
