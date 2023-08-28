@@ -223,7 +223,7 @@ jobs:
     needs: [build]
     strategy:
       matrix:
-        iid: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" ]
+        msg : [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" ]
     runs-on: ubuntu-latest
     name: "workflow-dispatch-identification-test [trigger|by workflow filename]"
     steps:
@@ -241,10 +241,10 @@ jobs:
         uses: ./
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-          run-name: "workflow-dispatch-${{ matrix.iid }}"
-          workflow: workflow-dispatch-identification.yml
+          run-name: "workflow-dispatch-${{ matrix.msg }}"
+          workflow: echo-02.yaml
           token: ${{ secrets.BROADBOT_TOKEN }}
           inputs: '{
-            "iid": "${{ matrix.iid }}",
-            "run-name": "workflow-dispatch-${{ matrix.iid }}"
+            "message": "${{ matrix.msg }}",
+            "run-name": "workflow-dispatch-${{ matrix.msg }}"
           }'
