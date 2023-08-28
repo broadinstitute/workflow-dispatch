@@ -9472,7 +9472,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const args = utils_1.getArgs();
-            const workflowHandler = new workflow_handler_1.WorkflowHandler(args.token, args.workflowRef, args.owner, args.repo, args.ref);
+            const workflowHandler = new workflow_handler_1.WorkflowHandler(args.token, args.workflowRef, args.owner, args.repo, args.ref, args.runName);
             // Trigger workflow run
             yield workflowHandler.triggerWorkflow(args.inputs);
             core.info(`Workflow triggered 🚀`);
@@ -9568,6 +9568,7 @@ function getArgs() {
     const waitForCompletion = waitForCompletionStr && waitForCompletionStr === 'true';
     const waitForCompletionTimeout = toMilliseconds(core.getInput('wait-for-completion-timeout'));
     const checkStatusInterval = toMilliseconds(core.getInput('wait-for-completion-interval'));
+    const runName = core.getInput('run-name');
     return {
         token,
         workflowRef,
@@ -9580,7 +9581,8 @@ function getArgs() {
         displayWorkflowUrlInterval,
         checkStatusInterval,
         waitForCompletion,
-        waitForCompletionTimeout
+        waitForCompletionTimeout,
+        runName
     };
 }
 exports.getArgs = getArgs;
@@ -9685,11 +9687,12 @@ const ofConclusion = (conclusion) => {
     return WorkflowRunConclusion[key];
 };
 class WorkflowHandler {
-    constructor(token, workflowRef, owner, repo, ref) {
+    constructor(token, workflowRef, owner, repo, ref, runName) {
         this.workflowRef = workflowRef;
         this.owner = owner;
         this.repo = repo;
         this.ref = ref;
+        this.runName = runName;
         this.triggerDate = 0;
         // Get octokit client for making API calls
         this.octokit = github.getOctokit(token);
@@ -9773,12 +9776,16 @@ class WorkflowHandler {
                     event: 'workflow_dispatch'
                 });
                 debug_1.debug('List Workflow Runs', response);
-                const runs = response.data.workflow_runs
+                let runs = response.data.workflow_runs
                     .filter((r) => new Date(r.created_at).setMilliseconds(0) >= this.triggerDate);
+                if (this.runName) {
+                    core.info(`Filter by run-name: ${this.runName}`);
+                    runs = runs.filter((r) => r.name.trim().toLowerCase() === this.runName.trim().toLowerCase());
+                }
                 debug_1.debug(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((r) => ({
                     id: r.id,
                     name: r.name,
-                    created_at: r.creatd_at,
+                    created_at: r.created_at,
                     triggerDate: new Date(this.triggerDate).toISOString(),
                     created_at_ts: new Date(r.created_at).valueOf(),
                     triggerDateTs: this.triggerDate

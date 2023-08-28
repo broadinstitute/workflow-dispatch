@@ -51,7 +51,8 @@ export class WorkflowHandler {
               private workflowRef: string,
               private owner: string,
               private repo: string,
-              private ref: string) {
+              private ref: string,
+              private runName: string) {
     // Get octokit client for making API calls
     this.octokit = github.getOctokit(token)
   }
@@ -134,12 +135,16 @@ export class WorkflowHandler {
       });
       debug('List Workflow Runs', response);
 
-      const runs = response.data.workflow_runs
+      let runs = response.data.workflow_runs
         .filter((r: any) => new Date(r.created_at).setMilliseconds(0) >= this.triggerDate);
+      if (this.runName) {
+        core.info(`Filter by run-name: ${this.runName}`);
+        runs = runs.filter((r: any) => r.name.trim().toLowerCase() === this.runName.trim().toLowerCase());
+      }
       debug(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((r: any) => ({
         id: r.id,
         name: r.name,
-        created_at: r.creatd_at,
+        created_at: r.created_at,
         triggerDate: new Date(this.triggerDate).toISOString(),
         created_at_ts: new Date(r.created_at).valueOf(),
         triggerDateTs: this.triggerDate
