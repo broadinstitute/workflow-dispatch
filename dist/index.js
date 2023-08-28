@@ -10140,19 +10140,43 @@ class WorkflowHandler {
             core.info('owner=' + this.owner);
             core.info('repo=' + this.repo);
             core.info('ref=' + this.ref);
-            const result = yield this.octokit.rest.checks.listForRef({
-                check_name: runName,
+            //const result = await this.octokit.rest.checks.listForRef({
+            //  check_name: runName,
+            //  owner: this.owner,
+            //  repo: this.repo,
+            //  ref: this.ref,
+            //  filter: 'latest'
+            //});
+            //core.info('result.total_count='+result.total_count);
+            //core.info('result.check_runs[0].id='+result.check_runs[0].id);
+            //if (result.length == 0) {
+            //  throw new Error('Run not found');
+            //}
+            //return result.check_runs[0].id as number;
+            const workflowId = yield this.getWorkflowId();
+            const response = yield this.octokit.rest.actions.listWorkflowRuns({
                 owner: this.owner,
                 repo: this.repo,
-                ref: this.ref,
-                filter: 'latest'
+                workflow_id: workflowId,
+                event: 'workflow_dispatch'
             });
-            core.info('result.total_count=' + result.total_count);
-            core.info('result.check_runs[0].id=' + result.check_runs[0].id);
-            if (result.length == 0) {
+            (0, debug_1.debug)('List Workflow Runs', response);
+            const runs = response.data.workflow_runs
+                .filter((r) => new Date(r.created_at).setMilliseconds(0) >= this.triggerDate && r.name === runName);
+            (0, debug_1.debug)(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((r) => ({
+                id: r.id,
+                name: r.name,
+                created_at: r.created_at,
+                triggerDate: new Date(this.triggerDate).toISOString(),
+                created_at_ts: new Date(r.created_at).valueOf(),
+                triggerDateTs: this.triggerDate
+            })));
+            core.info('runs.length=' + runs.length);
+            core.info('runs[0].id=' + runs[0].id);
+            if (runs.length == 0) {
                 throw new Error('Run not found');
             }
-            return result.check_runs[0].id;
+            return runs[0].id;
         });
     }
     getWorkflowId() {
