@@ -9762,6 +9762,7 @@ class WorkflowHandler {
         });
     }
     getWorkflowRunId() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (this.workflowRunId) {
                 return this.workflowRunId;
@@ -9780,7 +9781,16 @@ class WorkflowHandler {
                     .filter((r) => new Date(r.created_at).setMilliseconds(0) >= this.triggerDate);
                 if (this.runName) {
                     core.info(`Filter by run-name: ${this.runName}`);
-                    runs = runs.filter((r) => r.name.trim().toLowerCase() === this.runName.trim().toLowerCase());
+                    // By definition: display_title is the event-specific title associated with the run
+                    // or the run-name if set, or the value of run-name if it is set in the workflow.
+                    // However, GitHub also seems to set workflow run name to run-name if it is set
+                    // so for the sake of robustness we filter by either name or display_title.
+                    // See response schema of https://docs.github.com/en/free-pro-team@latest/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow
+                    runs = runs.filter((r) => {
+                        var _a;
+                        return r.name.trim().toLowerCase() === this.runName.trim().toLowerCase()
+                            || ((_a = r.display_title) !== null && _a !== void 0 ? _a : '').trim().toLowerCase() === this.runName.trim().toLowerCase();
+                    });
                 }
                 debug_1.debug(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((r) => ({
                     id: r.id,
@@ -9793,8 +9803,7 @@ class WorkflowHandler {
                 if (runs.length == 0) {
                     throw new Error('Run not found');
                 }
-                core.info(`The name of the workflow run: ${runs[0].name}`);
-                core.info(`The event-specific title associated with the run or the run-name if set, or the value of run-name if it is set in the workflow: ${runs[0].display_title}`);
+                core.info(((_a = runs[0].display_title) !== null && _a !== void 0 ? _a : '').trim().toLowerCase() === this.runName.trim().toLowerCase() ? 'true' : 'false');
                 this.workflowRunId = runs[0].id;
                 return this.workflowRunId;
             }
