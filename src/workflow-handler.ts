@@ -160,7 +160,6 @@ export class WorkflowHandler {
         throw new Error('Run not found');
       }
 
-      core.info((runs[0].display_title ?? '').trim().toLowerCase() === this.runName.trim().toLowerCase() ? 'true' : 'false');
       this.workflowRunId = runs[0].id as number;
       return this.workflowRunId;
     } catch (error) {

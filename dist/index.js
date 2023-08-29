@@ -9762,7 +9762,6 @@ class WorkflowHandler {
         });
     }
     getWorkflowRunId() {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (this.workflowRunId) {
                 return this.workflowRunId;
@@ -9803,7 +9802,6 @@ class WorkflowHandler {
                 if (runs.length == 0) {
                     throw new Error('Run not found');
                 }
-                core.info(((_a = runs[0].display_title) !== null && _a !== void 0 ? _a : '').trim().toLowerCase() === this.runName.trim().toLowerCase() ? 'true' : 'false');
                 this.workflowRunId = runs[0].id;
                 return this.workflowRunId;
             }
