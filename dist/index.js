@@ -9793,6 +9793,8 @@ class WorkflowHandler {
                 if (runs.length == 0) {
                     throw new Error('Run not found');
                 }
+                core.info(`The name of the workflow run: ${runs[0].name}`);
+                core.info(`The event-specific title associated with the run or the run-name if set, or the value of run-name if it is set in the workflow: ${runs[0].display_title}`);
                 this.workflowRunId = runs[0].id;
                 return this.workflowRunId;
             }

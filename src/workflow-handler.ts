@@ -36,8 +36,8 @@ const ofConclusion = (conclusion: string | null): WorkflowRunConclusion => {
 }
 
 export interface WorkflowRunResult {
-  url: string, 
-  status: WorkflowRunStatus, 
+  url: string,
+  status: WorkflowRunStatus,
   conclusion: WorkflowRunConclusion
 }
 
@@ -149,11 +149,13 @@ export class WorkflowHandler {
         created_at_ts: new Date(r.created_at).valueOf(),
         triggerDateTs: this.triggerDate
       })));
-  
+
       if (runs.length == 0) {
         throw new Error('Run not found');
       }
 
+      core.info(`The name of the workflow run: ${runs[0].name}`);
+      core.info(`The event-specific title associated with the run or the run-name if set, or the value of run-name if it is set in the workflow: ${runs[0].display_title}`);
       this.workflowRunId = runs[0].id as number;
       return this.workflowRunId;
     } catch (error) {
@@ -174,7 +176,7 @@ export class WorkflowHandler {
     }
     try {
       const workflowsResp = await this.octokit.rest.actions.listRepoWorkflows({
-        owner: this.owner, 
+        owner: this.owner,
         repo: this.repo,
         per_page: 100 //max allowed
       });
