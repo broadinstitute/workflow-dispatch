@@ -1,5 +1,5 @@
 name: Message Echo 2
-
+run-name: ${{ inputs.run-name }}
 on: 
   workflow_dispatch:
     inputs:
@@ -7,6 +7,10 @@ on:
         description: "Message to echo"
         required: false
         default: "this is echo 2"
+      run-name:
+        description: 'Run Name of workflow dispatch'
+        required: false
+        default: ''
 
 jobs:
   echo:

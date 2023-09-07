@@ -36,8 +36,8 @@ const ofConclusion = (conclusion: string | null): WorkflowRunConclusion => {
 }
 
 export interface WorkflowRunResult {
-  url: string, 
-  status: WorkflowRunStatus, 
+  url: string,
+  status: WorkflowRunStatus,
   conclusion: WorkflowRunConclusion
 }
 
@@ -51,7 +51,8 @@ export class WorkflowHandler {
               private workflowRef: string,
               private owner: string,
               private repo: string,
-              private ref: string) {
+              private ref: string,
+              private runName: string) {
     // Get octokit client for making API calls
     this.octokit = github.getOctokit(token)
   }
@@ -134,17 +135,27 @@ export class WorkflowHandler {
       });
       debug('List Workflow Runs', response);
 
-      const runs = response.data.workflow_runs
+      let runs = response.data.workflow_runs
         .filter((r: any) => new Date(r.created_at).setMilliseconds(0) >= this.triggerDate);
+      if (this.runName) {
+        core.info(`Filter by run-name: ${this.runName}`);
+        // By definition: display_title is the event-specific title associated with the run
+        // or the run-name if set, or the value of run-name if it is set in the workflow.
+        // However, GitHub also seems to set workflow run name to run-name if it is set
+        // so for the sake of robustness we filter by either name or display_title.
+        // See response schema of https://docs.github.com/en/free-pro-team@latest/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow
+        runs = runs.filter((r: any) => r.name.trim().toLowerCase() === this.runName.trim().toLowerCase()
+          || (r.display_title ?? '').trim().toLowerCase() === this.runName.trim().toLowerCase());
+      }
       debug(`Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`, runs.map((r: any) => ({
         id: r.id,
         name: r.name,
-        created_at: r.creatd_at,
+        created_at: r.created_at,
         triggerDate: new Date(this.triggerDate).toISOString(),
         created_at_ts: new Date(r.created_at).valueOf(),
         triggerDateTs: this.triggerDate
       })));
-  
+
       if (runs.length == 0) {
         throw new Error('Run not found');
       }
@@ -169,7 +180,7 @@ export class WorkflowHandler {
     }
     try {
       const workflowsResp = await this.octokit.rest.actions.listRepoWorkflows({
-        owner: this.owner, 
+        owner: this.owner,
         repo: this.repo,
         per_page: 100 //max allowed
       });
