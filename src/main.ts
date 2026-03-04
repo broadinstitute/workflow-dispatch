@@ -21,7 +21,7 @@ async function getFollowUrl(workflowHandler: WorkflowHandler, interval: number, 
       const result = await workflowHandler.getWorkflowRunStatus();
       url = result.url;
     } catch(e) {
-      core.debug(`Failed to get workflow url: ${e.message}`);
+      core.debug(`Failed to get workflow url: ${(e as any).message}`);
     }
   } while (!url && !isTimedOut(start, timeout));
   return url;
@@ -38,7 +38,7 @@ async function waitForCompletionOrTimeout(workflowHandler: WorkflowHandler, chec
       status = result.status;
       core.debug(`Worflow is running for ${formatDuration(Date.now() - start)}. Current status=${status}`)
     } catch(e) {
-      core.warning(`Failed to get workflow status: ${e.message}`);
+      core.warning(`Failed to get workflow status: ${(e as any).message}`);
     }
   } while (status !== WorkflowRunStatus.COMPLETED && !isTimedOut(start, waitForCompletionTimeout));
   return { result, start }
@@ -89,7 +89,7 @@ export async function run(): Promise<void> {
     computeConclusion(start, args.waitForCompletionTimeout, result);
 
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed((error as any).message);
   }
 }
 

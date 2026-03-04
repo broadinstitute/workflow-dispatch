@@ -71,7 +71,7 @@ export class WorkflowHandler {
       });
       debug('Workflow Dispatch', dispatchResp);
     } catch (error) {
-      debug('Workflow Dispatch error', error.message);
+      debug('Workflow Dispatch error', (error as any).message);
       throw error;
     }
   }
