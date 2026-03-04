@@ -63,7 +63,7 @@ function computeConclusion(start: number, waitForCompletionTimeout: number, resu
 //
 // Main task function (async wrapper)
 //
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   try {
     const args = getArgs();
     const workflowHandler = new WorkflowHandler(args.token, args.workflowRef, args.owner, args.repo, args.ref, args.runName);
@@ -96,4 +96,6 @@ async function run(): Promise<void> {
 //
 // Call the main task run function
 //
-run()
+if (require.main === module) {
+  run();
+}

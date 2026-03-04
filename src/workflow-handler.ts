@@ -60,7 +60,8 @@ export class WorkflowHandler {
   async triggerWorkflow(inputs: any) {
     try {
       const workflowId = await this.getWorkflowId();
-      this.triggerDate = Date.now();
+      // Floor to the nearest second to match GitHub API precision
+      this.triggerDate = Math.floor(Date.now() / 1000) * 1000;
       const dispatchResp = await this.octokit.rest.actions.createWorkflowDispatch({
         owner: this.owner,
         repo: this.repo,
