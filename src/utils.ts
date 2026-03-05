@@ -7,7 +7,7 @@ enum TimeUnit {
   H = 60 * 60 * 1000
 }
 
-function toMilliseconds(timeWithUnit: string): number {
+export function toMilliseconds(timeWithUnit: string): number {
   const unitStr = timeWithUnit.substr(timeWithUnit.length-1);
   const unit = TimeUnit[unitStr.toUpperCase() as keyof typeof TimeUnit];
   if (!unit) {
